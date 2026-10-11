@@ -164,6 +164,67 @@ class SpectralGraph:
         _, vector = self.normalized_fiedler_vector()
         return self._best_threshold(vector, self.normalized_cut)
 
+    @staticmethod
+    def _kmeans(X, k, max_iter=100, seed=42):
+        X = np.asarray(X, dtype=float)
+
+        if X.ndim != 2 or not 1 <= k <= len(X):
+            raise ValueError("Invalid embedding or cluster count")
+        if not np.all(np.isfinite(X)):
+            raise ValueError("Embedding must contain finite values")
+        if max_iter < 1:
+            raise ValueError("max_iter must be positive")
+
+        rng = np.random.default_rng(seed)
+        centers = X[
+            rng.choice(len(X), size=k, replace=False)
+        ].copy()
+
+        for _ in range(max_iter):
+            distances = np.linalg.norm(
+                X[:, None, :] - centers[None, :, :],
+                axis=2
+            )
+            labels = np.argmin(distances, axis=1)
+
+            new_centers = centers.copy()
+
+            for cluster in range(k):
+                points = X[labels == cluster]
+                if len(points) > 0:
+                    new_centers[cluster] = points.mean(axis=0)
+
+            if np.allclose(centers, new_centers):
+                centers = new_centers
+                break
+
+            centers = new_centers
+
+        distances = np.linalg.norm(
+            X[:, None, :] - centers[None, :, :],
+            axis=2
+        )
+        labels = np.argmin(distances, axis=1)
+
+        return labels, centers
+
+    def spectral_clustering(self, k, max_iter=100, seed=42):
+        if not 1 <= k <= self.n:
+            raise ValueError("k must be between 1 and the number of vertices")
+
+        values, vectors = self.normalized_eigenpairs()
+        embedding = vectors[:, :k].copy()
+
+        row_norms = np.linalg.norm(embedding, axis=1)
+        nonzero = row_norms > 1e-12
+        embedding[nonzero] /= row_norms[nonzero, None]
+
+        labels, centers = self._kmeans(
+            embedding, k, max_iter=max_iter, seed=seed
+        )
+
+        return labels, values[:k], embedding, centers
+
 
 if __name__ == "__main__":
     A = np.array([
