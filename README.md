@@ -1,6 +1,6 @@
 # Spectral Graph Clustering
 
-A from-scratch implementation of spectral graph methods using Python and NumPy. The project explores how graph Laplacians and their eigenvectors can be used to identify communities in undirected graphs.
+A from-scratch implementation of spectral graph methods using Python and NumPy. This project explores how graph Laplacians and their eigenvectors reveal community structure in undirected, non-negatively weighted graphs.
 
 ## Concepts
 
@@ -15,7 +15,8 @@ A from-scratch implementation of spectral graph methods using Python and NumPy. 
 - Threshold-based two-way partitioning
 - Spectral embeddings for multi-community clustering
 - K-means clustering of embedded vertices
-- Comparison of ordinary and normalized spectral methods
+- Clustering evaluation using Adjusted Rand Index (ARI)
+- Robustness testing on randomly generated graphs
 
 ## Implementation
 
@@ -23,15 +24,16 @@ The `SpectralGraph` class constructs graph matrices, computes eigenpairs, checks
 
 Both ordinary and normalized Laplacians are supported. The normalized Laplacian construction handles isolated vertices without division-by-zero errors.
 
-For multi-community clustering, the implementation uses eigenvectors of the normalized Laplacian to create a low-dimensional representation of the vertices. K-means then groups the vertices into the requested number of clusters.
+For multi-community clustering, eigenvectors of the normalized Laplacian form a low-dimensional representation of the vertices. K-means groups the embedded vertices into the requested number of clusters.
 
 ## Experiments
 
 - `bridge_strength.py`: studies how adding edges between two dense communities affects spectral connectivity and normalized cut.
-- `compare_laplacians.py`: compares partitions obtained from ordinary and normalized Laplacians on the same graph.
-- `multi_community.py`: tests clustering on a graph containing three dense communities connected by weak bridges.
+- `compare_laplacians.py`: compares partitions obtained from ordinary and normalized Laplacians.
+- `multi_community.py`: tests three-community clustering on a graph containing dense groups connected by weak bridges.
+- `clustering_robustness.py`: evaluates clustering across randomly generated graphs with different within-community and between-community edge probabilities.
 
-In the multi-community experiment, nine vertices are divided into three dense groups connected by edges of weight 0.2. The graph remains connected, while its small normalized Laplacian eigenvalues reflect its weak community connections. The tested implementation recovered all three groups, each containing three vertices.
+The robustness experiment uses three planted communities of ten vertices each. It varies the probabilities of edges within and between communities and measures agreement with the known labels using ARI. Multiple random graph instances are evaluated for each setting.
 
 ## Project Structure
 
@@ -44,18 +46,20 @@ spectral-graph-clustering/
 │   ├── __init__.py
 │   ├── bridge_strength.py
 │   ├── compare_laplacians.py
-│   └── multi_community.py
+│   ├── multi_community.py
+│   └── clustering_robustness.py
 ├── results/
 │   ├── bridge_strength.txt
 │   ├── laplacian_comparison.txt
-│   └── multi_community.txt
+│   ├── multi_community.txt
+│   └── clustering_robustness.txt
 ├── requirements.txt
 └── README.md
 ```
 
 ## Setup
 
-Install the dependencies:
+Install dependencies:
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -73,12 +77,21 @@ Run the experiments from the project root:
 python3 -m experiments.bridge_strength
 python3 -m experiments.compare_laplacians
 python3 -m experiments.multi_community
+python3 -m experiments.clustering_robustness
+```
+
+Save robustness experiment output:
+
+```bash
+python3 -m experiments.clustering_robustness | tee results/clustering_robustness.txt
 ```
 
 ## Limitations
 
-The project focuses on undirected, non-negatively weighted graphs without self-loops. Spectral thresholding searches candidate two-way partitions derived from an eigenvector and does not guarantee a globally optimal cut. Multi-community clustering depends on the selected embedding dimensions and k-means initialization. The normalized method is not guaranteed to outperform the ordinary method on every graph.
+The implementation focuses on undirected graphs with non-negative edge weights and no self-loops. Spectral thresholding does not guarantee a globally optimal cut. Multi-community clustering depends on the chosen embedding dimensions and k-means initialization.
+
+Synthetic experiments provide controlled tests but do not establish performance on every real-world graph. When within-community and between-community edge probabilities are equal, the planted labels generally cannot be inferred reliably from the graph structure alone.
 
 ## Tools
 
-Python, NumPy, and Git.
+Python, NumPy, scikit-learn, and Git.
