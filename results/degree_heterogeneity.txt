@@ -1,0 +1,62 @@
+========================================================================================
+DAY 7 EXPERIMENT: DEGREE HETEROGENEITY IN SPECTRAL GRAPH CLUSTERING
+========================================================================================
+Graph Model: Separation-Calibrated Degree-Corrected SBM (N=30, K=3, n_c=10, trials=30)
+Baseline Parameters: p_in=0.65, p_out=0.08 (Target E[m_in]=87.75, Target E[m_out]=24.00)
+----------------------------------------------------------------------------------------
+
+1. PROPENSITY CALIBRATION & EXPECTED EDGE DENSITY CONTROLS
+----------------------------------------------------------------------------------------
+Condition                gamma  Theta CV   Theta[min,max]   E[m_in]  E[m_out]  Sat.Pairs
+Balanced                  0.00    0.0000     [1.00, 1.00]     87.75     24.00          0
+Moderately Imbalanced     0.45    0.3572     [0.66, 1.87]     87.75     24.00         21
+Highly Imbalanced         0.85    0.7427     [0.42, 2.95]     87.75     24.00         42
+
+2. REALIZED GRAPH DEGREE & COMMUNITY SEPARATION DIAGNOSTICS (MEAN +/- SD)
+----------------------------------------------------------------------------------------
+Condition                Deg Mean    Deg SD    Deg CV    Min/Max     m_in    m_out    Mix mu   Comp/Iso
+Balanced                     7.41      1.79 0.244+/-0.05   3.8/11.1    87.13    24.03    0.2164     0d/ 0i
+Moderately Imbalanced        7.40      2.50 0.340+/-0.05   3.0/13.2    87.53    23.53    0.2113     0d/ 0i
+Highly Imbalanced            7.39      3.11 0.423+/-0.04   2.5/14.9    87.40    23.47    0.2112     0d/ 0i
+
+3. CLUSTERING ACCURACY COMPARISON (ADJUSTED RAND INDEX, ALL 30 TRIALS)
+----------------------------------------------------------------------------------------
+Condition                Ord ARI (Mean+/-SD)  Ord Med  Norm ARI (Mean+/-SD)  Norm Med  Delta ARI (Mean+/-SD)
+Balanced                   0.9680 +/- 0.0925   1.0000     0.9900 +/- 0.0401    1.0000    +0.0220 +/- 0.0860
+Moderately Imbalanced      0.9170 +/- 0.1768   1.0000     0.9864 +/- 0.0352    1.0000    +0.0694 +/- 0.1673
+Highly Imbalanced          0.9073 +/- 0.1812   1.0000     1.0000 +/- 0.0000    1.0000    +0.0927 +/- 0.1812
+
+4. PAIRED STATISTICAL ANALYSIS (DELTA ARI = ARI_NORM - ARI_ORD)
+----------------------------------------------------------------------------------------
+Condition                    95% CI for Delta   Paired t   p (t-test)  Wilcoxon W   p (Wilcox)      W/T/L
+Balanced                   [-0.0101, +0.0541]     1.4012   1.7177e-01         0.0   2.5000e-01     3/27/0
+Moderately Imbalanced      [+0.0069, +0.1318]     2.2719   3.0692e-02         0.0   3.1250e-02     6/24/0
+Highly Imbalanced          [+0.0251, +0.1604]     2.8040   8.9119e-03         0.0   1.5625e-02     7/23/0
+
+5. CONNECTED-GRAPH SUBSET VERIFICATION & FAILURE-MODE OVERLAP
+----------------------------------------------------------------------------------------
+Condition               Conn.Trials  Conn.Delta ARI  Ord Fails(<0.5)  Norm Fails(<0.5)  Joint Fails
+Balanced                         30         +0.0220                0                 0            0
+Moderately Imbalanced            30         +0.0694                2                 0            0
+Highly Imbalanced                30         +0.0927                0                 0            0
+
+6. EIGENGAP (LAMBDA_4 - LAMBDA_3) & ROW-NORMALIZATION ABLATION
+----------------------------------------------------------------------------------------
+Condition                Gap L (Mean+/-SD)  Gap L_sym (Mean+/-SD)  Ord+RowNorm ARI  Norm-NoRowNorm ARI
+Balanced                  1.3985+/-0.6377       0.3343+/-0.0680           0.9832              0.9900
+Moderately Imbalanced     0.8876+/-0.5205       0.3310+/-0.0802           0.9447              0.9864
+Highly Imbalanced         0.7753+/-0.4152       0.3581+/-0.0653           0.9698              1.0000
+
+7. STRATIFIED ANALYSIS BY REALIZED MIXING PARAMETER (MU_EMP = M_OUT / M_TOTAL)
+----------------------------------------------------------------------------------------
+Mixing Stratum               Condition                  n   Mean mu   Ord ARI  Norm ARI  Delta ARI
+Low Mixing (mu <= Q33)       Balanced                  11    0.1823    1.0000    1.0000    +0.0000
+Low Mixing (mu <= Q33)       Moderately Imbalanced     11    0.1773    0.9815    0.9907    +0.0093
+Low Mixing (mu <= Q33)       Highly Imbalanced          9    0.1825    0.9887    1.0000    +0.0113
+Mid Mixing (Q33 < mu <= Q67) Balanced                   6    0.2170    0.9070    1.0000    +0.0930
+Mid Mixing (Q33 < mu <= Q67) Moderately Imbalanced      9    0.2133    0.9205    0.9887    +0.0682
+Mid Mixing (Q33 < mu <= Q67) Highly Imbalanced         14    0.2112    0.9022    1.0000    +0.0978
+High Mixing (mu > Q67)       Balanced                  13    0.2449    0.9691    0.9769    +0.0078
+High Mixing (mu > Q67)       Moderately Imbalanced     10    0.2471    0.8431    0.9796    +0.1366
+High Mixing (mu > Q67)       Highly Imbalanced          7    0.2482    0.8127    1.0000    +0.1873
+========================================================================================
