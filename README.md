@@ -96,24 +96,26 @@ Synthetic experiments provide controlled tests but do not establish performance 
 
 Python, NumPy, scikit-learn, and Git.
 
-
 ## Day 7 & Day 8 Research Investigation: Degree Heterogeneity and Regime Interactions
 
-### Day 7 Controlled Degree-Heterogeneity Benchmark ($N=30, K=3, n_c=10, p_{\mathrm{in}}=0.65, p_{\mathrm{out}}=0.08$, 30 trials/regime)
+### Day 7 Controlled Degree-Heterogeneity Benchmark (N = 30, K = 3, n_c = 10, p_in = 0.65, p_out = 0.08, 30 trials/regime)
 
-Using a Separation-Calibrated Degree-Corrected Stochastic Block Model (`experiments/degree_heterogeneity.py`) that holds expected within-community edges ($\mathbb{E}[m_{\mathrm{in}}] = 87.75$) and between-community edges ($\mathbb{E}[m_{\mathrm{out}}] = 24.00$) strictly invariant across degree-imbalance regimes:
+Using a Separation-Calibrated Degree-Corrected Stochastic Block Model (`experiments/degree_heterogeneity.py`) that holds expected within-community edges (E[m_in] = 87.75) and between-community edges (E[m_out] = 24.00) strictly invariant across degree-imbalance regimes:
 
-| Regime ($\gamma$) | $\mathrm{CV}_\theta$ | Realized $\bar{d} \pm s_d$ | Realized $\mathrm{CV}_d$ | $\bar{m}_{\mathrm{in}} / \bar{m}_{\mathrm{out}}$ | Mix $\bar{\mu}_{\mathrm{emp}}$ | Ord ARI (Mean $\pm$ SD) | Norm ARI (Mean $\pm$ SD) | Paired $\Delta\mathrm{ARI}$ | 95% CI | Paired $p$ ($t$ / Wilcox) |
+| Regime (gamma) | CV_theta | Realized Deg (Mean +/- SD) | Realized CV_d | m_in / m_out | Mix mu_emp | Ord ARI (Mean +/- SD) | Norm ARI (Mean +/- SD) | Paired Delta ARI | 95% CI | Paired p (t / Wilcox) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| Balanced ($0.00$) | $0.0000$ | $7.41 \pm 1.79$ | $0.244 \pm 0.05$ | $87.13 / 24.03$ | $0.2164$ | $0.9680 \pm 0.0925$ | $0.9900 \pm 0.0401$ | $+0.0220 \pm 0.0860$ | $[-0.0101, +0.0541]$ | $0.1718$ / $0.2500$ |
-| Moderate ($0.45$) | $0.3572$ | $7.40 \pm 2.50$ | $0.340 \pm 0.05$ | $87.53 / 23.53$ | $0.2113$ | $0.9170 \pm 0.1768$ | $0.9864 \pm 0.0352$ | $+0.0694 \pm 0.1673$ | $[+0.0069, +0.1318]$ | $0.0307$ / $0.0313$ |
-| High ($0.85$) | $0.7427$ | $7.39 \pm 3.11$ | $0.423 \pm 0.04$ | $87.40 / 23.47$ | $0.2112$ | $0.9073 \pm 0.1812$ | $1.0000 \pm 0.0000$ | $+0.0927 \pm 0.1812$ | $[+0.0251, +0.1604]$ | $0.0089$ / $0.0156$ |
+| Balanced (0.00) | 0.0000 | 7.41 +/- 1.79 | 0.244 +/- 0.05 | 87.13 / 24.03 | 0.2164 | 0.9680 +/- 0.0925 | 0.9900 +/- 0.0401 | +0.0220 +/- 0.0860 | [-0.0101, +0.0541] | 0.1718 / 0.2500 |
+| Moderate (0.45) | 0.3572 | 7.40 +/- 2.50 | 0.340 +/- 0.05 | 87.53 / 23.53 | 0.2113 | 0.9170 +/- 0.1768 | 0.9864 +/- 0.0352 | +0.0694 +/- 0.1673 | [+0.0069, +0.1318] | 0.0307 / 0.0313 |
+| High (0.85) | 0.7427 | 7.39 +/- 3.11 | 0.423 +/- 0.04 | 87.40 / 23.47 | 0.2112 | 0.9073 +/- 0.1812 | 1.0000 +/- 0.0000 | +0.0927 +/- 0.1812 | [+0.0251, +0.1604] | 0.0089 / 0.0156 |
+
+- **Eigengap Compression vs. Stability:** Across Balanced to High degree imbalance, the ordinary eigengap lambda_4(L) - lambda_3(L) drops by 44.6% (1.3985 to 0.7753), whereas the normalized eigengap lambda_4(L_sym) - lambda_3(L_sym) remains stable (0.3343 to 0.3581).
+- **Row-Normalization Ablation:** Removing spherical row normalization from L_sym (`Norm-NoRowNorm`) yields identical accuracy (0.9900, 0.9864, 1.0000), confirming that Laplacian degree normalization (D^(-1/2) L D^(-1/2)) is the primary source of robustness.
 
 ### Day 8 Two-Way Regime Interaction, Eigenvector Localization, & Sparse Regularization (`experiments/regime_interaction_study.py`)
 
-- **Strong Separation ($p_{\mathrm{out}}=0.02, \bar{\mu}\approx 0.06$):** Both $L$ and $L_{\mathrm{sym}}$ achieve $\mathrm{ARI} = 1.0000$ ($\Delta\mathrm{ARI} = 0.0000$) even under high degree heterogeneity because $\lambda_3(L)/d_{\min} \le 0.2523 \ll 1$.
-- **Elevated Mixing ($p_{\mathrm{out}}=0.22, \bar{\mu}\approx 0.42$):** As $\lambda_3(L)/d_{\min} \to 0.9977$ under High degree imbalance, $\mathrm{IPR}(L)$ surges to $0.3316$ (with the lowest-degree vertex absorbing $71.04\%$ of an eigenvector's squared norm, correlating with $\mathrm{ARI}_{\mathrm{ord}}$ at $r = -0.7494$ across all 450 graphs), causing $\mathrm{ARI}_{\mathrm{ord}}$ to drop to $0.3335$ while $\mathrm{ARI}_{\mathrm{norm}}$ achieves $0.8844$ ($\Delta\mathrm{ARI} = +0.5509$, $95\%$ CI $[+0.462, +0.640]$, Wilcoxon $p = 1.73 \times 10^{-6}$).
-- **Sparse Breakdown of $L_{\mathrm{sym}}$ & Regularized Recovery:** In the extreme sparse hub-periphery regime ($p_{\mathrm{in}}=0.32, p_{\mathrm{out}}=0.03, \gamma=1.00, \bar{d}_{\min}=0.17$), standard $L_{\mathrm{sym}}$ drops to $\mathrm{ARI} = 0.2134$ due to disconnected and pendant vertices, whereas degree-regularized $L_\tau$ ($\tau = 0.25\bar{d}$) restores accuracy to $\mathrm{ARI} = 0.7357$.
+- **Strong Separation (p_out = 0.02, mu = 0.06):** Both L and L_sym achieve ARI = 1.0000 (Delta ARI = 0.0000) even under high degree heterogeneity because lambda_3(L) / d_min <= 0.2523 << 1.
+- **Elevated Mixing (p_out = 0.22, mu = 0.42):** As lambda_3(L) / d_min approaches 0.9977 under High degree imbalance, the Inverse Participation Ratio IPR(L) surges to 0.3316 (with the lowest-degree vertex absorbing 71.04% of an eigenvector's squared norm, correlating with ARI_ord at r = -0.7494 across all 450 graphs), causing ARI_ord to drop to 0.3335 while ARI_norm achieves 0.8844 (Delta ARI = +0.5509, 95% CI [+0.462, +0.640], Wilcoxon p = 1.73e-6).
+- **Sparse Breakdown of L_sym & Regularized Recovery:** In the extreme sparse hub-periphery regime (p_in = 0.32, p_out = 0.03, gamma = 1.00, mean d_min = 0.17), standard L_sym drops to ARI = 0.2134 due to disconnected and pendant vertices, whereas degree-regularized L_tau (tau = 0.25 * mean_degree) restores accuracy to ARI = 0.7357.
 
 ### Reproduction & Research Paper
 
